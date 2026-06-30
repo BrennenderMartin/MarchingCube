@@ -22,21 +22,6 @@ class Viewer:
         (-1.0, 1.0, 1.0),
     ]
 
-    DEFAULT_MIDPOINTS = [
-        (1.0, 0, -1.0),
-        (0, -1.0, -1.0),
-        (1.0, -1.0, 0),
-        (0, 1.0, -1.0),
-        (1.0, 1.0, 0),
-        (-1.0, 0, -1.0),
-        (-1.0, 1.0, 0),
-        (-1.0, -1.0, 0),
-        (1.0, 0, 1.0),
-        (0, -1.0, 1.0),
-        (0, 1.0, 1.0),
-        (-1.0, 0, 1.0),
-    ]
-
     DEFAULT_EDGES = [
         (DEFAULT_VERTICES[0], DEFAULT_VERTICES[1]),
         (DEFAULT_VERTICES[0], DEFAULT_VERTICES[3]),
@@ -50,6 +35,21 @@ class Viewer:
         (DEFAULT_VERTICES[4], DEFAULT_VERTICES[6]),
         (DEFAULT_VERTICES[5], DEFAULT_VERTICES[7]),
         (DEFAULT_VERTICES[6], DEFAULT_VERTICES[7]),
+    ]
+
+    DEFAULT_MIDPOINTS = [
+        (1.0, 0, -1.0),
+        (0, -1.0, -1.0),
+        (1.0, -1.0, 0),
+        (0, 1.0, -1.0),
+        (1.0, 1.0, 0),
+        (-1.0, 0, -1.0),
+        (-1.0, 1.0, 0),
+        (-1.0, -1.0, 0),
+        (1.0, 0, 1.0),
+        (0, -1.0, 1.0),
+        (0, 1.0, 1.0),
+        (-1.0, 0, 1.0),
     ]
 
     DEFAULT_FACES = [
@@ -300,6 +300,37 @@ class Viewer:
                 midpoint.append(0)
         return midpoint
 
+    def _general_verticies(self, center=(0,0,0)):
+        verticies = []
+        for item in self.DEFAULT_VERTICES:
+            verticies.append(
+                (
+                    item[0] + center[0],
+                    item[1] + center[1],
+                    item[2] + center[2],
+                )
+            )
+        return verticies
+    
+    def _general_edges(self, verticies):
+        return [
+            (verticies[0], verticies[1]),
+            (verticies[0], verticies[3]),
+            (verticies[0], verticies[4]),
+            (verticies[1], verticies[2]),
+            (verticies[1], verticies[5]),
+            (verticies[2], verticies[3]),
+            (verticies[2], verticies[7]),
+            (verticies[3], verticies[6]),
+            (verticies[4], verticies[5]),
+            (verticies[4], verticies[6]),
+            (verticies[5], verticies[7]),
+            (verticies[6], verticies[7]),
+        ]
+
+
+    def general_cube(self, center=(0, 0, 0)):
+        ...
 
     def add_point(
         self,
@@ -396,20 +427,22 @@ class Viewer:
             }
         )
 
-    def _populate_defaults(self):
+    def _populate_defaults(self, center=(0,0,0)):
         if self.triangles or self.rectangles or self.points or self.lines:
             return
-
-        for i, item in enumerate(self.DEFAULT_VERTICES):
-            self.add_point(item)
-            trigPoints = []
-            for edge in self.DEFAULT_EDGES:
-                if edge[0] == item or edge[1] == item:
-                    trigPoints.append(self.find_midpoint(edge))
-            self.add_triangle(trigPoints, color=(0.5, 0.5, 0), filled=True, label=f"T on V {i}")
         
-        for i, item in enumerate(self.DEFAULT_EDGES):
-            self.add_line(item)
+        verticies = self._general_verticies(center)
+        edges = self._general_edges(verticies)
+
+        for i, item in enumerate(verticies):
+            self.add_point(item, label=f"V {i}")
+            trigPoints = []
+            for edge in edges:
+                if edge[0] == item or edge[1] == item:
+                    self.add_line(edge)
+                    trigPoints.append(self.find_midpoint(edge))
+            self.add_triangle(trigPoints, color=(1, 0, 1), filled=True, label=f"T on V {i}")
+        
 
 if __name__ == "__main__":
     Viewer().run()
