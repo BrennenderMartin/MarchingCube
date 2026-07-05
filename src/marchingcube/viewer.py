@@ -433,16 +433,23 @@ class Viewer:
         
         verticies = self._general_verticies(center)
         edges = self._general_edges(verticies)
+        midpoints = [self.find_midpoint(edge) for edge in edges]
+
+        for i, item in enumerate(edges):
+            self.add_line(item)
 
         for i, item in enumerate(verticies):
-            self.add_point(item, label=f"V {i}")
-            trigPoints = []
+            self.add_point(item)
+            """trigPoints = []
             for edge in edges:
                 if edge[0] == item or edge[1] == item:
                     self.add_line(edge)
                     trigPoints.append(self.find_midpoint(edge))
-            self.add_triangle(trigPoints, color=(1, 0, 1), filled=True, label=f"T on V {i}")
+            self.add_triangle(trigPoints, color=(1, 0, 1), filled=True, label=f"T on V {i}")"""
         
+        self.add_triangle([midpoints[1], midpoints[9], midpoints[8]], color=(1, 0, 0), filled=True, label=f"T 1")
+        self.add_triangle([midpoints[1], midpoints[0], midpoints[8]], color=(0, 1, 0), filled=True, label=f"T 2")
+        self.add_triangle([midpoints[3], midpoints[5], midpoints[6]], color=(0, 0, 1), filled=True, label=f"T 3")
 
 if __name__ == "__main__":
     Viewer().run()
