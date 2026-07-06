@@ -497,13 +497,7 @@ class Viewer:
         newQuadPoints = [x for x in newQuadPoints if x not in fulledgemidpoints]
         print(f"{newQuadPoints = }")
 
-        self.add_rectangle(newQuadPoints, color=(1, 1, 0), filled=True)
-
-        """
-        for edge in fulledges:
-                        for verticy in edge:
-                            if 
-        """
+        self.add_rectangle(newQuadPoints, color=(1, 1, 0), filled=False)
         
         #self.add_triangle([midpoints[1], midpoints[9], midpoints[8]], color=(1, 0, 0), filled=True, label=f"T 1")
         #self.add_triangle([midpoints[1], midpoints[0], midpoints[8]], color=(0, 1, 0), filled=True, label=f"T 2")
@@ -511,18 +505,3 @@ class Viewer:
 
 if __name__ == "__main__":
     Viewer().run()
-
-"""
-[
-    [
-        [1.0, 0, -1.0], 
-        [0, -1.0, -1.0], 
-        [1.0, -1.0, 0]
-    ], 
-    [
-        [1.0, -1.0, 0], 
-        [1.0, 0, 1.0], 
-        [0, -1.0, 1.0]
-    ]
-]
-"""
