@@ -12,14 +12,14 @@ class Viewer:
     )
 
     DEFAULT_VERTICES = [
-        (1.0, -1.0, -1.0),
-        (1.0, 1.0, -1.0),
-        (-1.0, 1.0, -1.0),
-        (-1.0, -1.0, -1.0),
-        (1.0, -1.0, 1.0),
-        (1.0, 1.0, 1.0),
-        (-1.0, -1.0, 1.0),
-        (-1.0, 1.0, 1.0),
+        (1.0, -1.0, -1.0),  #0
+        (1.0, 1.0, -1.0),   #1
+        (-1.0, 1.0, -1.0),  #2
+        (-1.0, -1.0, -1.0), #3
+        (1.0, -1.0, 1.0),   #4
+        (1.0, 1.0, 1.0),    #5
+        (-1.0, -1.0, 1.0),  #6
+        (-1.0, 1.0, 1.0),   #7
     ]
 
     DEFAULT_EDGES = [
@@ -300,6 +300,25 @@ class Viewer:
                 midpoint.append(0)
         return midpoint
 
+    def find_trigpoints(self, point, edges):
+        trigPoints = []
+        for edge in edges:
+            if edge[0] == point or edge[1] == point:
+                trigPoints.append(self.find_midpoint(edge))
+        return trigPoints
+
+    def _full_edges(self, populus, edges):
+        fulledges = []
+
+        for edge in edges:
+            count = 0
+            for point in populus:
+                if edge[0] == point or edge[1] == point:
+                    count += 1
+            if count == 2:
+                fulledges.append(edge)
+        return fulledges
+
     def _general_verticies(self, center=(0,0,0)):
         verticies = []
         for item in self.DEFAULT_VERTICES:
@@ -327,7 +346,6 @@ class Viewer:
             (verticies[5], verticies[7]),
             (verticies[6], verticies[7]),
         ]
-
 
     def general_cube(self, center=(0, 0, 0)):
         ...
@@ -435,21 +453,76 @@ class Viewer:
         edges = self._general_edges(verticies)
         midpoints = [self.find_midpoint(edge) for edge in edges]
 
-        for i, item in enumerate(edges):
-            self.add_line(item)
+        population = "10101000"
+        populus = []
 
-        for i, item in enumerate(verticies):
-            self.add_point(item)
+        for i, obj in enumerate(population):
+            if obj == "1":
+                self.add_point(verticies[i], color=(1, 0, 0), size=12)
+                populus.append(verticies[i])
+        
+        fulledges = self._full_edges(populus, edges)
+        fulledgemidpoints = [self.find_midpoint(edge) for edge in fulledges]
+        print(f"{population = }\n{populus = }\n{fulledges = }")
+
+        for i, edge in enumerate(edges):
+            self.add_line(edge)
+
+        for i, verticy in enumerate(verticies):
+            self.add_point(verticy, label=f"V {i}")
             """trigPoints = []
             for edge in edges:
-                if edge[0] == item or edge[1] == item:
+                if edge[0] == verticy or edge[1] == verticy:
                     self.add_line(edge)
                     trigPoints.append(self.find_midpoint(edge))
             self.add_triangle(trigPoints, color=(1, 0, 1), filled=True, label=f"T on V {i}")"""
         
-        self.add_triangle([midpoints[1], midpoints[9], midpoints[8]], color=(1, 0, 0), filled=True, label=f"T 1")
-        self.add_triangle([midpoints[1], midpoints[0], midpoints[8]], color=(0, 1, 0), filled=True, label=f"T 2")
-        self.add_triangle([midpoints[3], midpoints[5], midpoints[6]], color=(0, 0, 1), filled=True, label=f"T 3")
+        quadPoints = []
+        for i, point in enumerate(populus):
+            trigPoints = self.find_trigpoints(point, edges)
+            
+            for edge in fulledges:
+                if point in edge:
+                    quadPoints.append(trigPoints)
+                    trigPoints = None
+            
+            if trigPoints is not None:
+                self.add_triangle(trigPoints, color=(1, 0, 1), filled=True)
+        
+        print(f"{quadPoints = }")
+        newQuadPoints = []
+        for temp in quadPoints:
+            for item in temp:
+                newQuadPoints.append(item)
+        newQuadPoints = [x for x in newQuadPoints if x not in fulledgemidpoints]
+        print(f"{newQuadPoints = }")
+
+        self.add_rectangle(newQuadPoints, color=(1, 1, 0), filled=True)
+
+        """
+        for edge in fulledges:
+                        for verticy in edge:
+                            if 
+        """
+        
+        #self.add_triangle([midpoints[1], midpoints[9], midpoints[8]], color=(1, 0, 0), filled=True, label=f"T 1")
+        #self.add_triangle([midpoints[1], midpoints[0], midpoints[8]], color=(0, 1, 0), filled=True, label=f"T 2")
+        #self.add_triangle([midpoints[3], midpoints[5], midpoints[6]], color=(0, 0, 1), filled=True, label=f"T 3")
 
 if __name__ == "__main__":
     Viewer().run()
+
+"""
+[
+    [
+        [1.0, 0, -1.0], 
+        [0, -1.0, -1.0], 
+        [1.0, -1.0, 0]
+    ], 
+    [
+        [1.0, -1.0, 0], 
+        [1.0, 0, 1.0], 
+        [0, -1.0, 1.0]
+    ]
+]
+"""
